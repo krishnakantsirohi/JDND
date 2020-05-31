@@ -63,7 +63,7 @@ class CarController {
          * TODO: Use the `assembler` on that car and return the resulting output.
          *   Update the first line as part of the above implementing.
          */
-        return assembler.toResource(new Car());
+        return assembler.toResource(carService.findById(id));
     }
 
     /**
@@ -79,7 +79,8 @@ class CarController {
          * TODO: Use the `assembler` on that saved car and return as part of the response.
          *   Update the first line as part of the above implementing.
          */
-        Resource<Car> resource = assembler.toResource(new Car());
+        carService.save(car);
+        Resource<Car> resource = assembler.toResource(car);
         return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
     }
 
@@ -97,7 +98,21 @@ class CarController {
          * TODO: Use the `assembler` on that updated car and return as part of the response.
          *   Update the first line as part of the above implementing.
          */
-        Resource<Car> resource = assembler.toResource(new Car());
+        Car car1 = carService.findById(id);
+        if (car.getLocation()!=null)
+            car1.setLocation(car.getLocation());
+        if (car.getPrice()!=null)
+            car1.setPrice(car.getPrice());
+        if (car.getModifiedAt()!=null)
+            car1.setModifiedAt(car.getModifiedAt());
+        if (car.getDetails()!=null)
+            car1.setDetails(car.getDetails());
+        if (car.getCreatedAt()!=null)
+            car1.setCreatedAt(car.getCreatedAt());
+        if (car.getCondition()!=null)
+            car1.setCondition(car.getCondition());
+        carService.save(car1);
+        Resource<Car> resource = assembler.toResource(car1);
         return ResponseEntity.ok(resource);
     }
 
@@ -111,6 +126,7 @@ class CarController {
         /**
          * TODO: Use the Car Service to delete the requested vehicle.
          */
+        carService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,15 +1,26 @@
 package com.udacity.pricing.domain.price;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 
 /**
  * Represents the price of a given vehicle, including currency.
  */
+@Entity
 public class Price {
 
-    private String currency;
-    private BigDecimal price;
+    @Id
+    @Min(message = "Vehicle Id cannot be negative", value = 0)
     private Long vehicleId;
+
+    private String currency;
+    @Min(message = "Cannot be negative", value = 0)
+    private BigDecimal price;
+
 
     public Price() {
     }
