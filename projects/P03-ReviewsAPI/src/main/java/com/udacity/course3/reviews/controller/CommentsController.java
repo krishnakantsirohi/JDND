@@ -1,11 +1,16 @@
 package com.udacity.course3.reviews.controller;
 
+import com.udacity.course3.reviews.exception.NotFoundException;
+import com.udacity.course3.reviews.model.Comments;
+import com.udacity.course3.reviews.model.Reviews;
+import com.udacity.course3.reviews.repository.CommentsRepository;
+import com.udacity.course3.reviews.repository.ReviewsRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpServerErrorException;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Spring REST controller for working with comment entity.
@@ -15,6 +20,13 @@ import java.util.List;
 public class CommentsController {
 
     // TODO: Wire needed JPA repositories here
+    private final CommentsRepository commentsRepository;
+    private final ReviewsRepository reviewsRepository;
+
+    public CommentsController(CommentsRepository commentsRepository, ReviewsRepository reviewsRepository){
+        this.commentsRepository = commentsRepository;
+        this.reviewsRepository = reviewsRepository;
+    }
 
     /**
      * Creates a comment for a review.
@@ -27,8 +39,13 @@ public class CommentsController {
      * @param reviewId The id of the review.
      */
     @RequestMapping(value = "/reviews/{reviewId}", method = RequestMethod.POST)
-    public ResponseEntity<?> createCommentForReview(@PathVariable("reviewId") Integer reviewId) {
-        throw new HttpServerErrorException(HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<?> createCommentForReview(@PathVariable("reviewId") Integer reviewId, @RequestBody Comments comment) throws NotFoundException {
+        Optional<Reviews> optionalReview = reviewsRepository.findById(reviewId);
+        if (!optionalReview.isPresent())
+            throw new NotFoundException("Review " + reviewId + " Not Found.");
+        comment.setReviews(optionalReview.get());
+        comment = commentsRepository.save(comment);
+        return new ResponseEntity<>(comment, HttpStatus.OK);
     }
 
     /**
@@ -41,7 +58,10 @@ public class CommentsController {
      * @param reviewId The id of the review.
      */
     @RequestMapping(value = "/reviews/{reviewId}", method = RequestMethod.GET)
-    public List<?> listCommentsForReview(@PathVariable("reviewId") Integer reviewId) {
-        throw new HttpServerErrorException(HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<List<?>> listCommentsForReview(@PathVariable("reviewId") Integer reviewId) throws NotFoundException {
+        Optional<Reviews> reviews = reviewsRepository.findById(reviewId);
+        if (!reviews.isPresent())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(commentsRepository.findAllByReviews(reviews.get()), HttpStatus.OK);
     }
 }
