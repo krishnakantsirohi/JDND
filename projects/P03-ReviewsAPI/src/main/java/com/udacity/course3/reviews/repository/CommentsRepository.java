@@ -1,11 +1,10 @@
 package com.udacity.course3.reviews.repository;
 
 import com.udacity.course3.reviews.model.Comments;
-import com.udacity.course3.reviews.model.Reviews;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.List;
+import java.util.Optional;
 
-public interface CommentsRepository extends MongoRepository<Comments, Integer> {
-    List<Comments> findAllByReviews(Reviews review);
+public interface CommentsRepository extends MongoRepository<Comments, String> {
+    Optional<Comments> findById(String review_id);
 }

@@ -39,12 +39,14 @@ public class CommentsController {
      * @param reviewId The id of the review.
      */
     @RequestMapping(value = "/reviews/{reviewId}", method = RequestMethod.POST)
-    public ResponseEntity<?> createCommentForReview(@PathVariable("reviewId") Integer reviewId, @RequestBody Comments comment) throws NotFoundException {
+    public ResponseEntity<?> createCommentForReview(@PathVariable("reviewId") String reviewId, @RequestBody Comments comment) throws NotFoundException {
         Optional<Reviews> optionalReview = reviewsRepository.findById(reviewId);
         if (!optionalReview.isPresent())
-            throw new NotFoundException("Review " + reviewId + " Not Found.");
-        comment.setReviews(optionalReview.get());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         comment = commentsRepository.save(comment);
+        Reviews reviews = optionalReview.get();
+        reviews.getComments().add(comment);
+        reviewsRepository.save(reviews);
         return new ResponseEntity<>(comment, HttpStatus.OK);
     }
 
@@ -58,10 +60,10 @@ public class CommentsController {
      * @param reviewId The id of the review.
      */
     @RequestMapping(value = "/reviews/{reviewId}", method = RequestMethod.GET)
-    public ResponseEntity<List<?>> listCommentsForReview(@PathVariable("reviewId") Integer reviewId) throws NotFoundException {
+    public ResponseEntity<List<?>> listCommentsForReview(@PathVariable("reviewId") String reviewId) throws NotFoundException {
         Optional<Reviews> reviews = reviewsRepository.findById(reviewId);
         if (!reviews.isPresent())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        return new ResponseEntity<>(commentsRepository.findAllByReviews(reviews.get()), HttpStatus.OK);
+        return new ResponseEntity<>(reviews.get().getComments(), HttpStatus.OK);
     }
 }

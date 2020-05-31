@@ -1,33 +1,23 @@
 package com.udacity.course3.reviews.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.sql.Date;
 
-@Entity
+@Document("comments")
 public class Comments {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private String id;
     @NotNull
     private String comment_text;
-    @CreatedDate
-    @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP", insertable = false, updatable = false, nullable = false)
     private Date createddatetime;
-
-    @ManyToOne
-    @JoinColumn(name = "reviews_id", referencedColumnName = "id")
-    @JsonBackReference
-    private Reviews reviews;
 
     public Comments() {
     }
 
-    public Comments(Integer id, @NotNull String comment_text, Date createddatetime) {
+    public Comments(String id, @NotNull String comment_text, Date createddatetime) {
         this.id = id;
         this.comment_text = comment_text;
         this.createddatetime = createddatetime;
@@ -38,11 +28,11 @@ public class Comments {
         this.createddatetime = createddatetime;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -52,14 +42,6 @@ public class Comments {
 
     public void setComment_text(String comment_text) {
         this.comment_text = comment_text;
-    }
-
-    public Reviews getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(Reviews reviews) {
-        this.reviews = reviews;
     }
 
     @Override

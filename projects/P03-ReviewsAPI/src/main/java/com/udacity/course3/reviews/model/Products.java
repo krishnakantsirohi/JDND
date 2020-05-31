@@ -1,34 +1,31 @@
 package com.udacity.course3.reviews.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+@Document("products")
 public class Products {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private String id;
 
     @NotNull
     private String name;
     @NotNull
     private Double cost;
-    @CreatedDate
-    @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP", insertable = false, updatable = false, nullable = false)
     private Date createddatetime;
 
-    @OneToMany(mappedBy = "products", orphanRemoval = true, cascade = CascadeType.PERSIST)
-    @JsonManagedReference
-    private List<Reviews> reviews;
+    @DBRef
+    private List<Reviews> reviews = new ArrayList<>();
 
     public Products(){}
 
-    public Products(Integer id, @NotNull String name, @NotNull Double cost, Date createddatetime) {
+    public Products(String id, @NotNull String name, @NotNull Double cost, Date createddatetime) {
         this.id = id;
         this.name = name;
         this.cost = cost;
@@ -41,11 +38,11 @@ public class Products {
         this.createddatetime = createddatetime;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpServerErrorException;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,12 +42,14 @@ public class ReviewsController {
      * @return The created review or 404 if product id is not found.
      */
     @RequestMapping(value = "/reviews/products/{productId}", method = RequestMethod.POST)
-    public ResponseEntity<?> createReviewForProduct(@PathVariable("productId") Integer productId, @Valid @RequestBody Reviews reviews) throws NotFoundException {
+    public ResponseEntity<?> createReviewForProduct(@PathVariable("productId") String productId, @Valid @RequestBody Reviews reviews) throws NotFoundException {
         Optional<Products> optionalProducts = productsRepository.findById(productId);
         if (!optionalProducts.isPresent())
             throw new NotFoundException("Product " + productId + " Not Found.");
-        reviews.setProducts(optionalProducts.get());
         reviews = reviewsRepository.save(reviews);
+        Products products = optionalProducts.get();
+        products.getReviews().add(reviews);
+        productsRepository.save(products);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
@@ -57,11 +60,11 @@ public class ReviewsController {
      * @return The list of reviews.
      */
     @RequestMapping(value = "/reviews/products/{productId}", method = RequestMethod.GET)
-    public ResponseEntity<List<?>> listReviewsForProduct(@PathVariable("productId") Integer productId) {
+    public ResponseEntity<List<?>> listReviewsForProduct(@PathVariable("productId") String productId) {
         Optional<Products> product = productsRepository.findById(productId);
         if (!product.isPresent())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        List<?> reviews = reviewsRepository.findAllByProducts_Id(productId);
+        List<?> reviews = product.get().getReviews();
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 }

@@ -45,7 +45,7 @@ public class ProductsController {
      * @return The product if found, or a 404 not found.
      */
     @RequestMapping(value = "/{id}")
-    public ResponseEntity<?> findById(@PathVariable("id") Integer id) throws NotFoundException {
+    public ResponseEntity<?> findById(@PathVariable("id") String id) throws NotFoundException {
         Optional<Products> optionalProducts = productsRepository.findById(id);
         if (!optionalProducts.isPresent())
             throw new NotFoundException("Product " + id + " Not Found.");
